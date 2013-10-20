@@ -6,3 +6,5 @@ As a means of learning Go, I'm writing a few small programs to create interestin
 Current programs:
 * `rotation.go`: rotate a three-dimensional figure (i.e. an array of vector pairs) along a given axis
 * `parametric.go`: animate the effect of changing the t-step value of a given parametric function
+
+This project was inspired by http://www.pheelicks.com/2013/10/intro-to-images-in-go-part-1

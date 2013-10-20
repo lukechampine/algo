@@ -32,9 +32,10 @@ func (v *Vector) Unit() Vector {
 type Matrix [3][3]float64
 
 func (m *Matrix) Multiply(v Vector) Vector {
-	return Vector{v.X*m[0][0] + v.Y*m[0][1] + v.Z*m[0][2],
-		/*	   */ v.X*m[1][0] + v.Y*m[1][1] + v.Z*m[1][2],
-		/*	   */ v.X*m[2][0] + v.Y*m[2][1] + v.Z*m[2][2]}
+	return Vector{
+		v.X*m[0][0] + v.Y*m[0][1] + v.Z*m[0][2],
+		v.X*m[1][0] + v.Y*m[1][1] + v.Z*m[1][2],
+		v.X*m[2][0] + v.Y*m[2][1] + v.Z*m[2][2]}
 }
 
 // generate a transformation matrix that rotates along vector v by angle degrees
@@ -42,9 +43,10 @@ func RotationMatrix(angle float64, v Vector) Matrix {
 	s := math.Sin(angle * math.Pi / 180)
 	c := math.Cos(angle * math.Pi / 180)
 	v = v.Unit()
-	return [3][3]float64{[3]float64{v.X*v.X*(1-c) + c, v.X*v.Y*(1-c) - v.Z*s, v.X*v.Y*(1-c) + v.Y*s},
-		/*            */ [3]float64{v.X*v.Y*(1-c) + v.Z*s, v.Y*v.Y*(1-c) + c, v.Y*v.Z*(1-c) - v.X*s},
-		/*            */ [3]float64{v.X*v.Z*(1-c) - v.Y*s, v.Y*v.Z*(1-c) + v.X*s, v.Z*v.Z*(1-c) + c}}
+	return [3][3]float64{
+		[3]float64{v.X*v.X*(1-c) + c, v.X*v.Y*(1-c) - v.Z*s, v.X*v.Y*(1-c) + v.Y*s},
+		[3]float64{v.X*v.Y*(1-c) + v.Z*s, v.Y*v.Y*(1-c) + c, v.Y*v.Z*(1-c) - v.X*s},
+		[3]float64{v.X*v.Z*(1-c) - v.Y*s, v.Y*v.Z*(1-c) + v.X*s, v.Z*v.Z*(1-c) + c}}
 }
 
 type Line struct {
