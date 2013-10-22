@@ -42,19 +42,19 @@ func main() {
 	// canvas properties
 	width, height := 700, 700
 	// figure
-	lines := make([]Line, 12)
-	lines[0] = Line{Vector{-100, 100, 100}, Vector{100, 100, 100}}
-	lines[1] = Line{Vector{100, 100, 100}, Vector{100, -100, 100}}
-	lines[2] = Line{Vector{100, -100, 100}, Vector{-100, -100, 100}}
-	lines[3] = Line{Vector{-100, -100, 100}, Vector{-100, 100, 100}}
-	lines[4] = Line{Vector{-100, 100, -100}, Vector{100, 100, -100}}
-	lines[5] = Line{Vector{100, 100, -100}, Vector{100, -100, -100}}
-	lines[6] = Line{Vector{100, -100, -100}, Vector{-100, -100, -100}}
-	lines[7] = Line{Vector{-100, -100, -100}, Vector{-100, 100, -100}}
-	lines[8] = Line{Vector{-100, 100, 100}, Vector{-100, 100, -100}}
-	lines[9] = Line{Vector{100, 100, 100}, Vector{100, 100, -100}}
-	lines[10] = Line{Vector{100, -100, 100}, Vector{100, -100, -100}}
-	lines[11] = Line{Vector{-100, -100, 100}, Vector{-100, -100, -100}}
+	lines := [12]Line{
+		Line{Vector{-100, 100, 100}, Vector{100, 100, 100}},
+		Line{Vector{100, 100, 100}, Vector{100, -100, 100}},
+		Line{Vector{100, -100, 100}, Vector{-100, -100, 100}},
+		Line{Vector{-100, -100, 100}, Vector{-100, 100, 100}},
+		Line{Vector{-100, 100, -100}, Vector{100, 100, -100}},
+		Line{Vector{100, 100, -100}, Vector{100, -100, -100}},
+		Line{Vector{100, -100, -100}, Vector{-100, -100, -100}},
+		Line{Vector{-100, -100, -100}, Vector{-100, 100, -100}},
+		Line{Vector{-100, 100, 100}, Vector{-100, 100, -100}},
+		Line{Vector{100, 100, 100}, Vector{100, 100, -100}},
+		Line{Vector{100, -100, 100}, Vector{100, -100, -100}},
+		Line{Vector{-100, -100, 100}, Vector{-100, -100, -100}}}
 	// draw loop
 	numSteps := 100
 	frameChan := make(chan int, numSteps)
