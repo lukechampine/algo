@@ -27,19 +27,16 @@ func main() {
 		Line{Vector{-100, -100, 100}, Vector{-100, -100, -100}}}
 	// draw loop
 	numSteps := 100
-	frameChan := make(chan int, numSteps)
 	for i := 0; i < numSteps; i++ {
-		frameChan <- i
 		// draw each frame in a separate goroutine
-		go func() {
-			num := <-frameChan
+		go func(num int) {
 			canvas := NewCanvas(width, height)
 			tMatrix := RotationMatrix(float64(num*360/numSteps), Vector{1, 1, 1})
 			for j := range figure {
 				canvas.DrawLine(figure[j].Transform(tMatrix).Projection())
 			}
 			canvas.SaveToFile(num)
-		}()
+		}(i)
 	}
 	// animation and clean-up
 	log.Print("finished computation")

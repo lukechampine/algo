@@ -30,16 +30,13 @@ func main() {
 	step := 0.0
 	numSteps := 100
 	inc := math.Pi / float64(numSteps)
-	frameChan := make(chan int, numSteps)
 	for i := 0; i < numSteps; i++ {
-		frameChan <- i
 		// draw each frame in a separate goroutine
-		go func() {
-			num := <-frameChan
+		go func(num int) {
 			canvas := NewCanvas(width, height)
 			canvas.DrawParaFn(step + float64(num)*inc)
 			canvas.SaveToFile(num)
-		}()
+		}(i)
 	}
 	log.Print("finished computation")
 	exec.Command("sh", "-c", "convert -delay 10 -loop 0 input-*.png output.gif").Run()

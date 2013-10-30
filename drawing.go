@@ -28,7 +28,7 @@ func (v Vector) Unit() Vector {
 
 type Matrix [3][3]float64
 
-func (m Matrix) Multiply(v Vector) Vector {
+func (m *Matrix) Multiply(v *Vector) Vector {
 	return Vector{
 		v.X*m[0][0] + v.Y*m[0][1] + v.Z*m[0][2],
 		v.X*m[1][0] + v.Y*m[1][1] + v.Z*m[1][2],
@@ -49,8 +49,8 @@ type Line struct {
 	V1, V2 Vector
 }
 
-func (l Line) Transform(m Matrix) Line {
-	return Line{m.Multiply(l.V1), m.Multiply(l.V2)}
+func (l *Line) Transform(m Matrix) Line {
+	return Line{m.Multiply(&l.V1), m.Multiply(&l.V2)}
 }
 
 func (l Line) Projection() Line {
@@ -64,21 +64,24 @@ type Canvas struct {
 func NewCanvas(width, height int) *Canvas {
 	canvas := new(Canvas)
 	canvas.RGBA = *image.NewRGBA(image.Rect(0, 0, width, height))
-	size := canvas.Bounds().Size()
-	for x := 0; x < size.X; x++ {
-		for y := 0; y < size.Y; y++ {
-			color := color.RGBA{255, 255, 255, 255}
-			canvas.Set(x, y, color)
-		}
-	}
+	canvas.Clear()
 	return canvas
 }
 
-func (c Canvas) SmartSet(x, y int, color color.RGBA) {
-	c.Set(x+c.Bounds().Size().X/2, -y+c.Bounds().Size().Y/2, color)
+func (c *Canvas) Clear() {
+	size := c.Bounds().Size()
+	for x := 0; x < size.X; x++ {
+		for y := 0; y < size.Y; y++ {
+			c.Set(x, y, color.RGBA{255, 255, 255, 255})
+		}
+	}
 }
 
-func (c Canvas) DrawLine(l Line) {
+func (c *Canvas) SmartSet(x, y int, color color.RGBA) {
+	c.Set(c.Bounds().Size().X/2+x, c.Bounds().Size().Y/2-y, color)
+}
+
+func (c *Canvas) DrawLine(l Line) {
 	length := l.V2.Sub(l.V1).Length()
 	unit := l.V2.Sub(l.V1).Unit()
 	for i := 0; i < int(length); i++ {
@@ -89,7 +92,7 @@ func (c Canvas) DrawLine(l Line) {
 	}
 }
 
-func (c Canvas) SaveToFile(num int) {
+func (c *Canvas) SaveToFile(num int) {
 	outFilename := ""
 	if num < 10 {
 		outFilename = "input-00" + strconv.Itoa(num) + ".png"
@@ -100,5 +103,5 @@ func (c Canvas) SaveToFile(num int) {
 	}
 	outFile, _ := os.Create(outFilename)
 	defer outFile.Close()
-	png.Encode(outFile, &c)
+	png.Encode(outFile, c)
 }
