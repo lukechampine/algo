@@ -9,7 +9,6 @@ import (
 
 type FrameWriter struct {
 	gif.GIF
-	sync.Mutex
 }
 
 func NewFrameWriter(numFrames int) *FrameWriter {
@@ -22,10 +21,16 @@ func NewFrameWriter(numFrames int) *FrameWriter {
 	return fw
 }
 
-func (fw *FrameWriter) AddFrame(c *Canvas, index int) {
-	fw.Lock()
-	fw.Image[index] = &c.Paletted
-	fw.Unlock()
+func (fw *FrameWriter) GenerateFrames(frameFunc func(int) *Canvas) {
+	var wg sync.WaitGroup
+	wg.Add(len(fw.Image))
+	for i := range fw.Image {
+		go func(index int) {
+			fw.Image[index] = &frameFunc(index).Paletted
+			wg.Done()
+		}(i)
+	}
+	wg.Wait()
 }
 
 func (fw *FrameWriter) WriteToFile(filename string) error {

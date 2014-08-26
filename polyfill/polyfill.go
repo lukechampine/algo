@@ -4,7 +4,6 @@ import (
 	"image/color"
 	"image/color/palette"
 	"runtime"
-	"sync"
 
 	. "github.com/lukechampine/algo/algo"
 )
@@ -131,24 +130,17 @@ func main() {
 	// draw loop
 	numSteps := 100
 	fw := NewFrameWriter(numSteps)
-	var wg sync.WaitGroup
-	wg.Add(numSteps)
-	for i := 0; i < numSteps; i++ {
-		// draw each frame in a separate goroutine
-		go func(num int) {
-			canvas := NewCanvas(width, height)
-			tMatrix := RotationMatrix(float64(num*360/numSteps), Vector{1, 1, 1})
-			for j := range figure {
-				tTri := figure[j].transform(tMatrix)
-				if tTri.isVisible() {
-					drawTri(canvas, tTri, color.RGBA{uint8(j * 20), 0, uint8(255 - j*20), 255})
-				}
+	fw.GenerateFrames(func(num int) *Canvas {
+		canvas := NewCanvas(width, height)
+		tMatrix := RotationMatrix(float64(num*360/numSteps), Vector{1, 1, 1})
+		for j := range figure {
+			tTri := figure[j].transform(tMatrix)
+			if tTri.isVisible() {
+				drawTri(canvas, tTri, color.RGBA{uint8(j * 20), 0, uint8(255 - j*20), 255})
 			}
-			fw.AddFrame(canvas, num)
-			wg.Done()
-		}(i)
-	}
-	wg.Wait()
+		}
+		return canvas
+	})
 
 	// encode frames as a GIF
 	err := fw.WriteToFile("output.gif")
