@@ -42,7 +42,9 @@ func main() {
 		for j := range figure {
 			tTri := figure[j].Transform(tMatrix)
 			if tTri.IsVisible() {
-				canvas.DrawTriangle(tTri, color.RGBA{uint8(j * 20), 0, uint8(255 - j*20), 255})
+				canvas.FillTriangle(tTri, color.RGBA{uint8(j * 20), 0, uint8(255 - j*20), 255})
+				// draw the outline last, since we want it on top
+				canvas.DrawTriangle(tTri)
 			}
 		}
 		return canvas

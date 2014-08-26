@@ -39,8 +39,14 @@ func (c *Canvas) DrawLine(l Line) {
 	}
 }
 
+func (c *Canvas) DrawTriangle(tri Triangle) {
+	c.DrawLine(Line{tri[0], tri[1]})
+	c.DrawLine(Line{tri[1], tri[2]})
+	c.DrawLine(Line{tri[2], tri[0]})
+}
+
 // algorithm taken from www-users.mat.uni.torun.pl/~wrona/3d_tutor/tri_fillers.html
-func (c *Canvas) DrawTriangle(tri Triangle, col color.RGBA) {
+func (c *Canvas) FillTriangle(tri Triangle, col color.RGBA) {
 	// compute colorIndex
 	colorIndex := uint8(color.Palette(palette.Plan9).Index(col))
 
@@ -111,9 +117,4 @@ func (c *Canvas) DrawTriangle(tri Triangle, col color.RGBA) {
 			c.CartSet(int(j), int(i), colorIndex)
 		}
 	}
-
-	// draw outline
-	c.DrawLine(Line{tri[0], tri[1]})
-	c.DrawLine(Line{tri[1], tri[2]})
-	c.DrawLine(Line{tri[2], tri[0]})
 }
