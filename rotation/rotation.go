@@ -1,17 +1,14 @@
 package main
 
 import (
-	"runtime"
-
 	. "github.com/lukechampine/algo/algo"
 )
 
 func main() {
-	// use all available logical processors
-	runtime.GOMAXPROCS(runtime.NumCPU())
 	// canvas properties
 	width, height := 700, 700
-	// figure
+
+	// drawing variables
 	figure := [12]Line{
 		Line{Vector{-100, 100, 100}, Vector{100, 100, 100}},
 		Line{Vector{100, 100, 100}, Vector{100, -100, 100}},
@@ -26,9 +23,10 @@ func main() {
 		Line{Vector{100, -100, 100}, Vector{100, -100, -100}},
 		Line{Vector{-100, -100, 100}, Vector{-100, -100, -100}},
 	}
-	// draw loop
 	numSteps := 100
 	fw := NewFrameWriter(numSteps)
+
+	// drawing function
 	fw.GenerateFrames(func(num int) *Canvas {
 		canvas := NewCanvas(width, height)
 		tMatrix := RotationMatrix(float64(num*360/numSteps), Vector{1, 1, 1})

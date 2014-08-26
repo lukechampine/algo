@@ -2,7 +2,6 @@ package main
 
 import (
 	"math"
-	"runtime"
 
 	. "github.com/lukechampine/algo/algo"
 )
@@ -22,15 +21,16 @@ func paraFn(t float64) Vector {
 }
 
 func main() {
-	// use all available logical processors
-	runtime.GOMAXPROCS(runtime.NumCPU())
 	// canvas properties
 	width, height := 700, 700
-	// draw loop
+
+	// drawing variables
 	step := 0.0
 	numSteps := 100
 	inc := math.Pi / float64(numSteps)
 	fw := NewFrameWriter(numSteps)
+
+	// drawing function
 	fw.GenerateFrames(func(num int) *Canvas {
 		canvas := NewCanvas(width, height)
 		drawParaFn(canvas, step+float64(num)*inc)

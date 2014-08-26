@@ -4,8 +4,14 @@ import (
 	"image"
 	"image/gif"
 	"os"
+	"runtime"
 	"sync"
 )
+
+func init() {
+	// use all available logical processors
+	runtime.GOMAXPROCS(runtime.NumCPU())
+}
 
 type FrameWriter struct {
 	gif.GIF
