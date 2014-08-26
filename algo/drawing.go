@@ -1,4 +1,4 @@
-package main
+package algo
 
 import (
 	"image"
@@ -24,6 +24,14 @@ func (v Vector) Length() float64 {
 func (v Vector) Unit() Vector {
 	l := v.Length()
 	return Vector{v.X / l, v.Y / l, v.Z / l}
+}
+
+func (u Vector) Cross(v Vector) Vector {
+	return Vector{
+		u.Y*v.Z - u.Z*v.Y,
+		u.Z*v.X - u.X*v.Z,
+		u.X*v.Y - u.Y*v.X,
+	}
 }
 
 type Matrix [3][3]float64
@@ -101,7 +109,13 @@ func (c *Canvas) SaveToFile(num int) {
 	} else {
 		outFilename = "input-" + strconv.Itoa(num) + ".png"
 	}
-	outFile, _ := os.Create(outFilename)
+	outFile, err := os.Create(outFilename)
+	if err != nil {
+		panic(err)
+	}
 	defer outFile.Close()
-	png.Encode(outFile, c)
+	err = png.Encode(outFile, c)
+	if err != nil {
+		panic(err)
+	}
 }

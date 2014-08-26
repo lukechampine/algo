@@ -5,16 +5,18 @@ import (
 	"log"
 	"os/exec"
 	"runtime"
+
+	. "github.com/lukechampine/algo/algo"
 )
 
 type Triangle [3]Vector
 
-func (p Triangle) Transform(m Matrix) Triangle {
+func (p Triangle) transform(m Matrix) Triangle {
 	return Triangle{m.Multiply(&p[0]), m.Multiply(&p[1]), m.Multiply(&p[2])}
 }
 
-func (p Triangle) IsVisible() bool {
-	// a trigon is visible if its cross product points towards the viewer
+func (p Triangle) isVisible() bool {
+	// a triangle is visible if the cross products of its vertices point towards the viewer
 	// since we are only concerned with the Z coordinate, we can optimize a bit
 	ux, uy := p[1].X-p[0].X, p[1].Y-p[0].Y
 	vx, vy := p[2].X-p[0].X, p[2].Y-p[0].Y
@@ -22,7 +24,7 @@ func (p Triangle) IsVisible() bool {
 }
 
 // algorithm taken from www-users.mat.uni.torun.pl/~wrona/3d_tutor/tri_fillers.html
-func (c Canvas) DrawTri(tri Triangle, color color.RGBA) {
+func drawTri(c *Canvas, tri Triangle, color color.RGBA) {
 	// sort points by Y value
 	if tri[1].Y < tri[0].Y {
 		tri[1], tri[0] = tri[0], tri[1]
@@ -121,7 +123,8 @@ func main() {
 		Triangle{Vector{-100, -100, -100}, Vector{100, -100, 100}, Vector{100, -100, -100}},
 		// left (X = -100)
 		Triangle{Vector{-100, 100, -100}, Vector{-100, 100, 100}, Vector{-100, -100, -100}},
-		Triangle{Vector{-100, -100, -100}, Vector{-100, 100, 100}, Vector{-100, -100, 100}}}
+		Triangle{Vector{-100, -100, -100}, Vector{-100, 100, 100}, Vector{-100, -100, 100}},
+	}
 	// draw loop
 	numSteps := 50
 	for i := 0; i < numSteps; i++ {
@@ -130,9 +133,9 @@ func main() {
 			canvas := NewCanvas(width, height)
 			tMatrix := RotationMatrix(float64(num*360/numSteps), Vector{1, 1, 1})
 			for j := range figure {
-				tTri := figure[j].Transform(tMatrix)
-				if tTri.IsVisible() {
-					canvas.DrawTri(tTri, color.RGBA{uint8(j * 20), 0, uint8(255 - j*20), 255})
+				tTri := figure[j].transform(tMatrix)
+				if tTri.isVisible() {
+					drawTri(canvas, tTri, color.RGBA{uint8(j * 20), 0, uint8(255 - j*20), 255})
 				}
 			}
 			canvas.SaveToFile(num)
@@ -140,7 +143,10 @@ func main() {
 	}
 	// animation and clean-up
 	log.Print("finished computation")
-	exec.Command("sh", "-c", "convert -delay 10 -loop 0 input-*.png output.gif").Run()
+	err := exec.Command("sh", "-c", "convert -delay 10 -loop 0 input-*.png output.gif").Run()
+	if err != nil {
+		log.Fatal(err)
+	}
 	log.Print("output rendered as gif")
 	exec.Command("sh", "-c", "rm input-*.png").Run()
 }

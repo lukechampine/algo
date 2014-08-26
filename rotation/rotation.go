@@ -4,6 +4,8 @@ import (
 	"log"
 	"os/exec"
 	"runtime"
+
+	. "github.com/lukechampine/algo/algo"
 )
 
 func main() {
@@ -24,7 +26,8 @@ func main() {
 		Line{Vector{-100, 100, 100}, Vector{-100, 100, -100}},
 		Line{Vector{100, 100, 100}, Vector{100, 100, -100}},
 		Line{Vector{100, -100, 100}, Vector{100, -100, -100}},
-		Line{Vector{-100, -100, 100}, Vector{-100, -100, -100}}}
+		Line{Vector{-100, -100, 100}, Vector{-100, -100, -100}},
+	}
 	// draw loop
 	numSteps := 100
 	for i := 0; i < numSteps; i++ {

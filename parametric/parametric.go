@@ -5,9 +5,11 @@ import (
 	"math"
 	"os/exec"
 	"runtime"
+
+	. "github.com/lukechampine/algo/algo"
 )
 
-func (c Canvas) DrawParaFn(step float64) {
+func drawParaFn(c *Canvas, step float64) {
 	t := float64(0)
 	for i := 0; i < 100; i++ {
 		c.DrawLine(Line{paraFn(t), paraFn(t + step)})
@@ -34,7 +36,7 @@ func main() {
 		// draw each frame in a separate goroutine
 		go func(num int) {
 			canvas := NewCanvas(width, height)
-			canvas.DrawParaFn(step + float64(num)*inc)
+			drawParaFn(canvas, step+float64(num)*inc)
 			canvas.SaveToFile(num)
 		}(i)
 	}
