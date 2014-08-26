@@ -1,9 +1,7 @@
 package main
 
 import (
-	"log"
 	"math"
-	"os/exec"
 	"runtime"
 	"sync"
 
@@ -33,6 +31,7 @@ func main() {
 	step := 0.0
 	numSteps := 100
 	inc := math.Pi / float64(numSteps)
+	fw := NewFrameWriter(numSteps)
 	var wg sync.WaitGroup
 	wg.Add(numSteps)
 	for i := 0; i < numSteps; i++ {
@@ -40,13 +39,16 @@ func main() {
 		go func(num int) {
 			canvas := NewCanvas(width, height)
 			drawParaFn(canvas, step+float64(num)*inc)
-			canvas.SaveToFile(num)
+			fw.AddFrame(canvas, num)
 			wg.Done()
 		}(i)
 	}
 	wg.Wait()
-	log.Print("finished computation")
-	exec.Command("sh", "-c", "convert -delay 10 -loop 0 input-*.png output.gif").Run()
-	log.Print("output rendered as gif")
-	exec.Command("sh", "-c", "rm input-*.png").Run()
+
+	// encode frames as a gif
+	err := fw.WriteToFile("output.gif")
+	if err != nil {
+		println(err.Error())
+	}
+	return
 }

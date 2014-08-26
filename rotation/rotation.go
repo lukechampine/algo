@@ -1,8 +1,6 @@
 package main
 
 import (
-	"log"
-	"os/exec"
 	"runtime"
 	"sync"
 
@@ -31,6 +29,7 @@ func main() {
 	}
 	// draw loop
 	numSteps := 100
+	fw := NewFrameWriter(numSteps)
 	var wg sync.WaitGroup
 	wg.Add(numSteps)
 	for i := 0; i < numSteps; i++ {
@@ -41,14 +40,16 @@ func main() {
 			for j := range figure {
 				canvas.DrawLine(figure[j].Transform(tMatrix).Projection())
 			}
-			canvas.SaveToFile(num)
+			fw.AddFrame(canvas, num)
 			wg.Done()
 		}(i)
 	}
 	wg.Wait()
-	// animation and clean-up
-	log.Print("finished computation")
-	exec.Command("sh", "-c", "convert -delay 10 -loop 0 input-*.png output.gif").Run()
-	log.Print("output rendered as gif")
-	exec.Command("sh", "-c", "rm input-*.png").Run()
+
+	// encode frames as a gif
+	err := fw.WriteToFile("output.gif")
+	if err != nil {
+		println(err.Error())
+	}
+	return
 }

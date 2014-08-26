@@ -2,8 +2,6 @@ package main
 
 import (
 	"image/color"
-	"log"
-	"os/exec"
 	"runtime"
 	"sync"
 
@@ -128,6 +126,7 @@ func main() {
 	}
 	// draw loop
 	numSteps := 50
+	fw := NewFrameWriter(numSteps)
 	var wg sync.WaitGroup
 	wg.Add(numSteps)
 	for i := 0; i < numSteps; i++ {
@@ -141,17 +140,15 @@ func main() {
 					drawTri(canvas, tTri, color.RGBA{uint8(j * 20), 0, uint8(255 - j*20), 255})
 				}
 			}
-			canvas.SaveToFile(num)
+			fw.AddFrame(canvas, num)
 			wg.Done()
 		}(i)
 	}
 	wg.Wait()
-	// animation and clean-up
-	log.Print("finished computation")
-	err := exec.Command("sh", "-c", "convert -delay 10 -loop 0 input-*.png output.gif").Run()
+
+	// encode frames as a GIF
+	err := fw.WriteToFile("output.gif")
 	if err != nil {
-		log.Fatal(err)
+		println(err.Error())
 	}
-	log.Print("output rendered as gif")
-	exec.Command("sh", "-c", "rm input-*.png").Run()
 }

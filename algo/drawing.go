@@ -3,10 +3,8 @@ package algo
 import (
 	"image"
 	"image/color"
-	"image/png"
+	"image/color/palette"
 	"math"
-	"os"
-	"strconv"
 )
 
 type Vector struct {
@@ -66,12 +64,12 @@ func (l Line) Projection() Line {
 }
 
 type Canvas struct {
-	image.RGBA
+	image.Paletted
 }
 
 func NewCanvas(width, height int) *Canvas {
 	canvas := new(Canvas)
-	canvas.RGBA = *image.NewRGBA(image.Rect(0, 0, width, height))
+	canvas.Paletted = *image.NewPaletted(image.Rect(0, 0, width, height), palette.Plan9)
 	canvas.Clear()
 	return canvas
 }
@@ -80,7 +78,7 @@ func (c *Canvas) Clear() {
 	size := c.Bounds().Size()
 	for x := 0; x < size.X; x++ {
 		for y := 0; y < size.Y; y++ {
-			c.Set(x, y, color.RGBA{255, 255, 255, 255})
+			c.SetColorIndex(x, y, 0xFF)
 		}
 	}
 }
@@ -97,25 +95,5 @@ func (c *Canvas) DrawLine(l Line) {
 		y := l.V1.Y + float64(i)*unit.Y
 		// adjust for canvas coordinate system
 		c.SmartSet(int(x), int(y), color.RGBA{0, 0, 0, 255})
-	}
-}
-
-func (c *Canvas) SaveToFile(num int) {
-	outFilename := ""
-	if num < 10 {
-		outFilename = "input-00" + strconv.Itoa(num) + ".png"
-	} else if num < 100 {
-		outFilename = "input-0" + strconv.Itoa(num) + ".png"
-	} else {
-		outFilename = "input-" + strconv.Itoa(num) + ".png"
-	}
-	outFile, err := os.Create(outFilename)
-	if err != nil {
-		panic(err)
-	}
-	defer outFile.Close()
-	err = png.Encode(outFile, c)
-	if err != nil {
-		panic(err)
 	}
 }
