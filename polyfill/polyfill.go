@@ -2,6 +2,7 @@ package main
 
 import (
 	"image/color"
+	"image/color/palette"
 	"runtime"
 	"sync"
 
@@ -23,7 +24,10 @@ func (p Triangle) isVisible() bool {
 }
 
 // algorithm taken from www-users.mat.uni.torun.pl/~wrona/3d_tutor/tri_fillers.html
-func drawTri(c *Canvas, tri Triangle, color color.RGBA) {
+func drawTri(c *Canvas, tri Triangle, col color.RGBA) {
+	// compute colorIndex
+	colorIndex := uint8(color.Palette(palette.Plan9).Index(col))
+
 	// sort points by Y value
 	if tri[1].Y < tri[0].Y {
 		tri[1], tri[0] = tri[0], tri[1]
@@ -60,7 +64,7 @@ func drawTri(c *Canvas, tri Triangle, color color.RGBA) {
 		l, r := botFn1(i), botFn2(i)
 		// draw scanline
 		for j := l; j <= r; j++ {
-			c.SmartSet(int(j), int(i), color)
+			c.CartSet(int(j), int(i), colorIndex)
 		}
 	}
 	// determine linear equations for top half
@@ -88,7 +92,7 @@ func drawTri(c *Canvas, tri Triangle, color color.RGBA) {
 		l, r := topFn1(i), topFn2(i)
 		// draw scanline
 		for j := l; j <= r; j++ {
-			c.SmartSet(int(j), int(i), color)
+			c.CartSet(int(j), int(i), colorIndex)
 		}
 	}
 
@@ -125,7 +129,7 @@ func main() {
 		Triangle{Vector{-100, -100, -100}, Vector{-100, 100, 100}, Vector{-100, -100, 100}},
 	}
 	// draw loop
-	numSteps := 50
+	numSteps := 100
 	fw := NewFrameWriter(numSteps)
 	var wg sync.WaitGroup
 	wg.Add(numSteps)

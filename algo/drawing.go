@@ -2,7 +2,6 @@ package algo
 
 import (
 	"image"
-	"image/color"
 	"image/color/palette"
 	"math"
 )
@@ -75,25 +74,23 @@ func NewCanvas(width, height int) *Canvas {
 }
 
 func (c *Canvas) Clear() {
-	size := c.Bounds().Size()
-	for x := 0; x < size.X; x++ {
-		for y := 0; y < size.Y; y++ {
-			c.SetColorIndex(x, y, 0xFF)
-		}
+	for i := range c.Pix {
+		c.Pix[i] = 0xFF // white
 	}
 }
 
-func (c *Canvas) SmartSet(x, y int, color color.RGBA) {
-	c.Set(c.Bounds().Size().X/2+x, c.Bounds().Size().Y/2-y, color)
+// CartSet adjusts its input x and y coordinates to fit a Cartesian plane.
+// In other words, it places (0,0) at the center of the Canvas.
+func (c *Canvas) CartSet(x, y int, colorIndex uint8) {
+	c.SetColorIndex(c.Bounds().Size().X/2+x, c.Bounds().Size().Y/2-y, colorIndex)
 }
 
 func (c *Canvas) DrawLine(l Line) {
 	length := l.V2.Sub(l.V1).Length()
 	unit := l.V2.Sub(l.V1).Unit()
-	for i := 0; i < int(length); i++ {
-		x := l.V1.X + float64(i)*unit.X
-		y := l.V1.Y + float64(i)*unit.Y
-		// adjust for canvas coordinate system
-		c.SmartSet(int(x), int(y), color.RGBA{0, 0, 0, 255})
+	for i := float64(0); i < length; i++ {
+		x := l.V1.X + i*unit.X
+		y := l.V1.Y + i*unit.Y
+		c.CartSet(int(x), int(y), 0x00) // black
 	}
 }
