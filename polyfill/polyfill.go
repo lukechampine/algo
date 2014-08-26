@@ -5,6 +5,7 @@ import (
 	"log"
 	"os/exec"
 	"runtime"
+	"sync"
 
 	. "github.com/lukechampine/algo/algo"
 )
@@ -127,6 +128,8 @@ func main() {
 	}
 	// draw loop
 	numSteps := 50
+	var wg sync.WaitGroup
+	wg.Add(numSteps)
 	for i := 0; i < numSteps; i++ {
 		// draw each frame in a separate goroutine
 		go func(num int) {
@@ -139,8 +142,10 @@ func main() {
 				}
 			}
 			canvas.SaveToFile(num)
+			wg.Done()
 		}(i)
 	}
+	wg.Wait()
 	// animation and clean-up
 	log.Print("finished computation")
 	err := exec.Command("sh", "-c", "convert -delay 10 -loop 0 input-*.png output.gif").Run()

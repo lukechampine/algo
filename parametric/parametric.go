@@ -5,6 +5,7 @@ import (
 	"math"
 	"os/exec"
 	"runtime"
+	"sync"
 
 	. "github.com/lukechampine/algo/algo"
 )
@@ -32,14 +33,18 @@ func main() {
 	step := 0.0
 	numSteps := 100
 	inc := math.Pi / float64(numSteps)
+	var wg sync.WaitGroup
+	wg.Add(numSteps)
 	for i := 0; i < numSteps; i++ {
 		// draw each frame in a separate goroutine
 		go func(num int) {
 			canvas := NewCanvas(width, height)
 			drawParaFn(canvas, step+float64(num)*inc)
 			canvas.SaveToFile(num)
+			wg.Done()
 		}(i)
 	}
+	wg.Wait()
 	log.Print("finished computation")
 	exec.Command("sh", "-c", "convert -delay 10 -loop 0 input-*.png output.gif").Run()
 	log.Print("output rendered as gif")
