@@ -59,3 +59,18 @@ func (l *Line) Transform(m Matrix) Line {
 func (l Line) Projection() Line {
 	return Line{Vector{l.V1.X, l.V1.Y, 0}, Vector{l.V2.X, l.V2.Y, 0}}
 }
+
+type Triangle [3]Vector
+
+func (p Triangle) Transform(m Matrix) Triangle {
+	return Triangle{m.Multiply(&p[0]), m.Multiply(&p[1]), m.Multiply(&p[2])}
+}
+
+func (p Triangle) IsVisible() bool {
+	// a triangle is visible if the cross products of its vertices point towards the viewer
+	// since we are only concerned with the Z coordinate, we can optimize a bit
+	// note: this only works if the Triangle was defined in clockwise order
+	ux, uy := p[1].X-p[0].X, p[1].Y-p[0].Y
+	vx, vy := p[2].X-p[0].X, p[2].Y-p[0].Y
+	return uy*vx-ux*vy > 0
+}
